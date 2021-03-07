@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background: #fafafa;
+    }
+    web-splitter {
+      height: 250px;
+      width: 600px;
+    }
+  </style>
+</head>
+<body>
+  <web-splitter>
+    <div slot="primary">
+      Primary
+    </div>
+    <div slot="secondary">
+      Secondary
+    </div>
+  </web-splitter>
+  <web-splitter is-variable="false">
+    <div slot="primary">
+      Primary
+    </div>
+    <div slot="secondary">
+      Secondary
+    </div>
+  </web-splitter>
+  <web-splitter>
+    <div slot="primary">
+      Primary
+    </div>
+    <div slot="secondary">
+      Secondary
+    </div>
+  </web-splitter>
+
+  <script src="../dist/WebSplitter.js"></script>
+</body>
+</html>
