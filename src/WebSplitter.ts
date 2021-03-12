@@ -17,6 +17,7 @@ const template = html<WebSplitter>`
   @pointerdown=${(x, c) => x.handlePointerDown(c.event as PointerEvent)}>
   <div
     class="web-splitter__primary web-splitter__section-wrapper"
+    aria-hidden="${x => x.isPrimaryCollapsed ? 'true' : undefined}"
     ${ref('primaryWrapper')}>
     <slot name="primary"></slot>
   </div>
@@ -30,6 +31,7 @@ const template = html<WebSplitter>`
   </slot>
   <div
     class="web-splitter__secondary web-splitter__section-wrapper"
+    aria-hidden="${x => x.isSecondaryCollapsed ? 'true' : undefined}"
     ${ref('secondaryWrapper')}>
     <slot name="secondary"></slot>
   </div>
@@ -187,32 +189,6 @@ export class WebSplitter extends FASTElement {
 
     this._separator = this.defaultSeparator
     return this._separator;
-  }
-
-  isPrimaryCollapsedChanged(_oldValue: boolean, newValue: boolean): void {
-    if (this.primaryWrapper === undefined) {
-      return;
-    }
-
-    if (newValue === true) {
-      this.primaryWrapper.setAttribute('aria-hidden', 'true');
-      return;
-    }
-
-    this.primaryWrapper.removeAttribute('aria-hidden');
-  }
-
-  isSecondaryCollapsedChanged(_oldValue: boolean, newValue: boolean): void {
-    if (this.secondaryWrapper === undefined) {
-      return;
-    }
-
-    if (newValue === true) {
-      this.secondaryWrapper.setAttribute('aria-hidden', 'true');
-      return;
-    }
-
-    this.secondaryWrapper.removeAttribute('aria-hidden');
   }
 
   observePrimaryWidth(entries: ResizeObserverEntry[]): void {
