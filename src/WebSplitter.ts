@@ -1,6 +1,7 @@
 import {
   FASTElement,
   customElement,
+  attr,
   html,
   css,
   ref,
@@ -10,12 +11,12 @@ import {
 const template = html<WebSplitter>`
 <div
   :className="web-splitter ${x => x.isBeingDragged ? 'web-splitter--active' : ''}"
+  style="--web-splitter-movement: ${x => x.totalMovement + 'px'};"
   ${ref('container')}
   @keydown=${(x, c) => x.handleKeyDown(c.event as KeyboardEvent)}
   @pointerdown=${(x, c) => x.handlePointerDown(c.event as PointerEvent)}>
   <div
     class="web-splitter__primary web-splitter__section-wrapper"
-    ?aria-hidden="${x => x.isPrimaryCollapsed ? 'true' : false}"
     ${ref('primaryWrapper')}>
     <slot name="primary"></slot>
   </div>
@@ -29,14 +30,14 @@ const template = html<WebSplitter>`
   </slot>
   <div
     class="web-splitter__secondary web-splitter__section-wrapper"
-    ?aria-hidden="${x => x.isSecondaryCollapsed ? 'true' : false}"
     ${ref('secondaryWrapper')}>
     <slot name="secondary"></slot>
   </div>
 </div>
 `;
 
-const styles = css`:host {
+const styles = css`
+:host {
   display: block;
   box-sizing: border-box;
   contain: content;
@@ -128,16 +129,26 @@ export class WebSplitter extends FASTElement {
 
   _separator: HTMLElement;
 
-  @observable isSecondaryCollapsed = false;
-  @observable isPrimaryCollapsed = false;
-  @observable isBeingDragged = false;
+  @observable
+  isSecondaryCollapsed = false;
+  @observable
+  isPrimaryCollapsed = false;
+  @observable
+  isBeingDragged = false;
+  @observable
+  totalMovement = 0;
+
+  @attr
+  direction: 'horizontal' | 'vertical' = 'horizontal';
+  @attr({
+    mode: 'boolean',
+  })
+  isFixed = false;
 
   currentPointerLocation: number | null = null;
-  _totalMovement = 0;
   previousMovement: number | null = null;
   primaryWidthObserver: ResizeObserver;
   secondaryWidthObserver: ResizeObserver;
-
 
   constructor() {
     super();
@@ -147,26 +158,6 @@ export class WebSplitter extends FASTElement {
     );
     this.secondaryWidthObserver = new ResizeObserver(
       this.observeSecondaryWidth.bind(this),
-    );
-  }
-
-  get direction(): string {
-    return this.getAttribute('direction') ?? 'horizontal';
-  }
-
-  get isFixed(): boolean {
-    return this.hasAttribute('is-fixed');
-  }
-
-  get totalMovement(): number {
-    return this._totalMovement;
-  }
-
-  set totalMovement(value: number) {
-    this._totalMovement = value;
-    this.container.style.setProperty(
-      '--web-splitter-movement',
-      `${this.totalMovement}px`,
     );
   }
 
@@ -182,6 +173,32 @@ export class WebSplitter extends FASTElement {
 
     this._separator = this.defaultSeparator
     return this._separator;
+  }
+
+  isPrimaryCollapsedChanged(_oldValue: boolean, newValue: boolean): void {
+    if (this.primaryWrapper === undefined) {
+      return;
+    }
+
+    if (newValue === true) {
+      this.primaryWrapper.setAttribute('aria-hidden', 'true');
+      return;
+    }
+
+    this.primaryWrapper.removeAttribute('aria-hidden');
+  }
+
+  isSecondaryCollapsedChanged(_oldValue: boolean, newValue: boolean): void {
+    if (this.secondaryWrapper === undefined) {
+      return;
+    }
+
+    if (newValue === true) {
+      this.secondaryWrapper.setAttribute('aria-hidden', 'true');
+      return;
+    }
+
+    this.secondaryWrapper.removeAttribute('aria-hidden');
   }
 
   observePrimaryWidth(entries: ResizeObserverEntry[]): void {
