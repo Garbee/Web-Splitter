@@ -10,7 +10,7 @@ import {
 
 const template = html<WebSplitter>`
 <div
-  :className="web-splitter ${x => x.isBeingDragged ? 'web-splitter--active' : ''}"
+  :className=${x => x.generateContainerClasses()}
   style="--web-splitter-movement: ${x => x.totalMovement + 'px'};"
   ${ref('container')}
   @keydown=${(x, c) => x.handleKeyDown(c.event as KeyboardEvent)}
@@ -159,6 +159,20 @@ export class WebSplitter extends FASTElement {
     this.secondaryWidthObserver = new ResizeObserver(
       this.observeSecondaryWidth.bind(this),
     );
+  }
+
+  generateContainerClasses(): string {
+    let classValue = '';
+    const classes = {
+      'web-splitter': true,
+      'web-splitter--active': this.isBeingDragged,
+    };
+    for (const [key, value] of Object.entries(classes)) {
+      if (value === true) {
+        classValue += `${key} `;
+      }
+    }
+    return classValue;
   }
 
   get separator(): HTMLElement {
