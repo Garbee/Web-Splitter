@@ -1,0 +1,14 @@
+{
+  "compilerOptions":{
+    "module": "ES2020",
+    "target": "ES2020",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "moduleResolution": "Node",
+    "experimentalDecorators": true
+  },
+  "include": [
+    "./src/WebSplitter.ts"
+  ]
+}
